@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function Admin() {
   const [session, setSession] = useState(null);
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [sent, setSent] = useState(false);
 
@@ -58,21 +58,24 @@ export default function Admin() {
     setMsg("");
 
     const { error } = await supabase().auth.signInWithOtp({
-      phone,
+      email,
     });
 
     if (error) {
       setMsg(error.message);
     } else {
       setSent(true);
+      setMsg("OTP sent to your email.");
     }
   }
 
   async function coachVerify() {
+    setMsg("");
+
     const { data, error } = await supabase().auth.verifyOtp({
-      phone,
+      email,
       token: otp,
-      type: "sms",
+      type: "email",
     });
 
     if (error) {
@@ -235,15 +238,16 @@ export default function Admin() {
           <h1>Coach Admin</h1>
 
           <p className="muted">
-            Use the coach phone number configured in Supabase.
+            Enter the coach email configured in Supabase.
             Only accounts with role=coach can access the dashboard.
           </p>
 
           <input
             className="input"
-            placeholder="+91XXXXXXXXXX"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            type="email"
+            placeholder="coach@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           {sent && (
@@ -283,7 +287,6 @@ export default function Admin() {
       {msg && <div className="success">{msg}</div>}
 
       <div className="grid">
-        {/* CREATE COURSE */}
         <div className="card">
           <h2>Create course</h2>
 
@@ -320,7 +323,6 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* ADD MODULE */}
         <div className="card">
           <h2>Add module</h2>
 
@@ -357,7 +359,6 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* UPLOAD VIDEO */}
         <div className="card">
           <h2>Upload lesson video</h2>
 
@@ -412,7 +413,6 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* QUIZ BUILDER */}
       <div
         className="card"
         style={{ marginTop: 20 }}
@@ -439,7 +439,6 @@ export default function Admin() {
         </button>
       </div>
 
-      {/* YOUR COURSES */}
       <div
         className="card"
         style={{ marginTop: 20 }}
