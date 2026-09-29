@@ -6,8 +6,7 @@ import { supabase } from "@/lib/supabase";
 export default function Admin() {
   const [session, setSession] = useState(null);
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState("");
 
   const [courses, setCourses] = useState([]);
   const [modules, setModules] = useState([]);
@@ -54,28 +53,17 @@ export default function Admin() {
     }
   }
 
-  async function coachSend() {
+  async function coachLogin() {
     setMsg("");
 
-    const { error } = await supabase().auth.signInWithOtp({
-      email,
-    });
-
-    if (error) {
-      setMsg(error.message);
-    } else {
-      setSent(true);
-      setMsg("OTP sent to your email.");
+    if (!email || !password) {
+      setMsg("Please enter your email and password.");
+      return;
     }
-  }
 
-  async function coachVerify() {
-    setMsg("");
-
-    const { data, error } = await supabase().auth.verifyOtp({
+    const { data, error } = await supabase().auth.signInWithPassword({
       email,
-      token: otp,
-      type: "email",
+      password,
     });
 
     if (error) {
@@ -238,8 +226,8 @@ export default function Admin() {
           <h1>Coach Admin</h1>
 
           <p className="muted">
-            Enter the coach email configured in Supabase.
-            Only accounts with role=coach can access the dashboard.
+            Sign in with the coach email and password configured
+            in Supabase.
           </p>
 
           <input
@@ -250,22 +238,18 @@ export default function Admin() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          {sent && (
-            <input
-              className="input"
-              placeholder="OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-            />
-          )}
+          <input
+            className="input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
           {msg && <div className="error">{msg}</div>}
 
-          <button
-            className="btn"
-            onClick={sent ? coachVerify : coachSend}
-          >
-            {sent ? "Verify OTP" : "Send OTP"}
+          <button className="btn" onClick={coachLogin}>
+            Login
           </button>
         </div>
       </main>
@@ -431,10 +415,7 @@ export default function Admin() {
           placeholder='[{"question":"What does SELECT do?","options":["Reads data","Deletes data","Creates data"],"correct_option":"Reads data"}]'
         />
 
-        <button
-          className="btn"
-          onClick={saveQuiz}
-        >
+        <button className="btn" onClick={saveQuiz}>
           Save quiz
         </button>
       </div>
