@@ -1,0 +1,7 @@
+import {supabaseAdmin} from "@/lib/supabaseAdmin";
+export const dynamic="force-dynamic";
+export default async function Home(){
+ const {data:courses}=await supabaseAdmin().from("courses").select("id,slug,title,description,price_inr").eq("published",true).order("created_at",{ascending:true});
+ const fallback=courses?.length?courses:[{slug:"sql",title:"SQL",description:"SQL fundamentals and interview practice.",price_inr:499},{slug:"python",title:"Python",description:"Python fundamentals and practical projects.",price_inr:699},{slug:"java",title:"Java",description:"Core Java and OOP.",price_inr:699},{slug:"soft-skills",title:"Soft Skills",description:"Communication and workplace readiness.",price_inr:399}];
+ return <main className="container"><section className="hero"><span className="badge">WELCOME TO THE COACHES</span><h1>Learn. Practice. Get Certified.</h1><p className="muted">Complete your course, pass the assessment with at least 60%, and receive your certificate.</p></section><h2>Courses</h2><div className="grid">{fallback.map(c=><a className="card" href={"/course/"+c.slug} key={c.slug}><span className="badge">₹{c.price_inr}</span><h2>{c.title}</h2><p className="muted">{c.description}</p><span className="btn">View course →</span></a>)}</div></main>
+}

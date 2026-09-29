@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {requireUser} from "@/lib/auth";import {supabaseAdmin} from "@/lib/supabaseAdmin";
+export async function POST(req){try{const user=await requireUser(req);const {module_id}=await req.json();const {error}=await supabaseAdmin().from("module_progress").upsert({user_id:user.id,module_id,completed:true,updated_at:new Date().toISOString()},{onConflict:"user_id,module_id"});if(error)throw error;return NextResponse.json({ok:true})}catch(e){return NextResponse.json({error:e.message},{status:400})}}

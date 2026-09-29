@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {supabaseAdmin} from "@/lib/supabaseAdmin";
+export async function GET(req,{params}){const {id}=await params;const {data,error}=await supabaseAdmin().from("courses").select("id,slug,title,description,price_inr").eq("slug",id).single();if(error)return NextResponse.json({error:"Not found"},{status:404});return NextResponse.json(data)}
